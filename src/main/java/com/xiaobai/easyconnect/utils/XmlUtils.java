@@ -7,11 +7,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
-import java.io.File;
 import java.util.Iterator;
 
 /**
@@ -32,7 +28,7 @@ public class XmlUtils {
             String name = e.getName();
             Element tmp = root.addElement(name);
             String value = "";
-            if(e.elements().size() > 1) {
+            if(e.elements().size() > 0) {
                 value = parseReqXml(e, entity);
                 tmp.setText(value);
             } else {
@@ -59,7 +55,7 @@ public class XmlUtils {
         while(iterator.hasNext()) {
             Element e = (Element)iterator.next();
             String name = e.getName();
-            if(e.elements().size() > 1) {
+            if(e.elements().size() > 0) {
                 parseRspStr(e, StringEscapeUtils.unescapeXml(root.element(name).asXML()), entity);
                 String value = root.element(name).asXML();
                 if(null == value) {
@@ -69,9 +65,10 @@ public class XmlUtils {
             } else {
                 String value = e.getText();
                 if(value.startsWith(START)) {
-                    String val = root.element(value.substring(1)).getText();
-                    if(null == val) {
-                        val = "";
+                    String val = "";
+                    Element e1 = root.element(value.substring(1));
+                    if(null != e1) {
+                        val = e1.getText();
                     }
                     entity.put(name, val);
                 } else {

@@ -110,6 +110,7 @@ public class EasyconnectImpl implements Easyconnect {
             HttpResponse response = httpClient.execute(httpPost);
             if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 String result = EntityUtils.toString(response.getEntity());
+                result = "<root>" + result + "</root>";
                 XmlUtils.parseRspStr(rsp, result, rspEntity);
                 rspEntity.setMsgCd(MsgCdEnum.SUCC.getMsgCd());
                 rspEntity.setMsgInf(MsgCdEnum.SUCC.getMsgInf());
