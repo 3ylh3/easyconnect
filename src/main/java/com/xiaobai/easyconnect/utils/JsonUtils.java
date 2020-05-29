@@ -1,8 +1,9 @@
 package com.xiaobai.easyconnect.utils;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.xiaobai.easyconnect.Entity;
+import com.xiaobai.easyconnect.common.Entity;
 
 import java.util.Map;
 
@@ -15,20 +16,29 @@ import java.util.Map;
 public class JsonUtils {
     private static final String START = "$";
 
-    public static String parseReqJson(JSONObject jsonObject, Entity map) {
+    public static String parseReqJson(JSONObject jsonObject, Entity entity) {
         JSONObject result = new JSONObject();
         for(Map.Entry<String, Object> entry : jsonObject.entrySet()) {
             String key = entry.getKey();
             if(entry.getValue() instanceof JSONObject) {
-                String value = parseReqJson((JSONObject) entry.getValue(), map);
+                String value = parseReqJson((JSONObject) entry.getValue(), entity);
                 if(null == value) {
                     value = "";
                 }
                 result.put(key, JSONObject.parseObject(value));
-            } else {
+            } else if(entry.getValue() instanceof JSONArray) {
+                JSONArray array = (JSONArray) entry.getValue();
+                JSONArray tmp = new JSONArray();
+                for(int i = 0;i < array.size();i++) {
+                    String value = parseReqJson((JSONObject) array.get(i), entity);
+                    tmp.add(JSONObject.parseObject(value));
+                }
+                result.put(key, tmp);
+            }
+            else {
                 String value = (String)entry.getValue();
                 if(value.startsWith(START)) {
-                    String val = map.get(value.substring(1));
+                    String val = entity.get(value.substring(1));
                     if(null == val) {
                         val = "";
                     }
@@ -52,7 +62,15 @@ public class JsonUtils {
                     val = "";
                 }
                 entity.put(key, val);
-            } else {
+            } else if(entry.getValue() instanceof JSONArray) {
+                JSONArray array = (JSONArray) entry.getValue();
+                JSONArray tmp = strJson.getJSONArray(key);
+                for(int i = 0;i < array.size();i++) {
+                    entity.put(key + "_" + i, JSON.toJSONString(tmp.get(i)));
+                }
+                entity.put(key + "_size", String.valueOf(array.size()));
+            }
+            else {
                 String value = (String)entry.getValue();
                 if(value.startsWith(START)) {
                     String val = strJson.getString(value.substring(1));

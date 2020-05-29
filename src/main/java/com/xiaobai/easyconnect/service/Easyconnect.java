@@ -1,6 +1,6 @@
 package com.xiaobai.easyconnect.service;
 
-import com.xiaobai.easyconnect.Entity;
+import com.xiaobai.easyconnect.common.Entity;
 
 /**
  * easyconnect接口
@@ -9,5 +9,6 @@ import com.xiaobai.easyconnect.Entity;
  * @date 2020/5/28
  */
 public interface Easyconnect {
-    public Entity postJson(String code, Entity message);
+    Entity postJson(String code, Entity message);
+    Entity postXml(String code, Entity message);
 }
